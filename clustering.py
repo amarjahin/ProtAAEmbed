@@ -1,7 +1,6 @@
 import torch
 import esm
 import numpy as np
-from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from collections import Counter
@@ -123,16 +122,6 @@ for model_name in models:
     # Extract embeddings
     aa_embeddings, aa_tokens = get_aa_embeddings(model_name)
 
-    # t-SNE 2D projection
-    tsne = TSNE(
-        n_components=2,
-        perplexity=8,
-        learning_rate="auto",
-        init="random",
-        random_state=0,
-    )
-    X_2d = tsne.fit_transform(aa_embeddings)
-
     # Assign chemical properties as ground-truth labels
     properties = np.array([aa_property(a) for a in aa_tokens])
 
@@ -142,9 +131,10 @@ for model_name in models:
     y_true_int = np.array([prop2id[p] for p in properties])
 
     # KMeans: 4 clusters for ProtBERT, 5 for ESM models
+    # Run on original high-dimensional embeddings
     n_clusters = 4 if model_name == "protbert" else 5
     kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init=10)
-    cluster_labels = kmeans.fit_predict(X_2d)
+    cluster_labels = kmeans.fit_predict(aa_embeddings)
 
     # Metrics
     purity = purity_score(properties, cluster_labels)
