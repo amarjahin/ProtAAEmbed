@@ -1,8 +1,8 @@
+# ProtAAEmbed
+A study of the amino acid embedding for different protein language models. 
 
+## Results
 
-
-
-# 
 Model                      Purity     ARI     NMI
 --------------------------------------------------
 esm2_t6_8M_UR50D            0.640   0.197   0.462
